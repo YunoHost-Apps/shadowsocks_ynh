@@ -65,9 +65,9 @@ ynh_print_info "Configuring firewall..."
 ###		- Remove the section "CLOSE A PORT" in the remove script
 
 
-if [ ${port} -ge 1 ] && [ ${port} -le 65535 ] && [ ${port:0:1} != 0 ]; then
+if [ ${out_port} -ge 1 ] && [ ${out_port} -le 65535 ] && [ ${out_port:0:1} != 0 ]; then
 	ynh_print_info "---------------------------"
-    ynh_print_info "Port to configure = ${port}"
+    ynh_print_info "Port to configure = ${out_port}"
     ynh_print_info "---------------------------"
     else
 		ynh_die "Please enter a correct number [1-65535]"
