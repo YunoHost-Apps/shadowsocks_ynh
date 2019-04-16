@@ -1,0 +1,56 @@
+{
+    "name": "Shadowsocks for  Yunohost",
+    "id": "shadowsocks",
+    "packaging_format": 1,
+    "description": {
+        "en": "A secure socks5 proxy,designed to protect your Internet traffic."
+    },
+    "version": "1.0~ynh1",
+    "url": "https://shadowsocks.org",
+    "license": "Apache",
+    "maintainer": {
+        "name": "Anmol Sharma",
+        "email": "anmol@datamol.org",
+        "url": "https://datamol.org"
+    },
+    "requirements": {
+        "yunohost": ">= 3.0.0"
+    },
+    "multi_instance": false,
+    "services": [
+        "shadowsocks"
+    ],
+    "arguments": {
+        "install" : [
+            {
+                "name": "password",
+                "type": "password",
+                "ask": {
+                    "en": "Set the password for Shadowsocks"
+                },
+                "help": {
+                    "en": "Set the passowrd for Shadowsocks for authentication"
+                },
+                "example": "secure_password"
+            },
+            {
+                "name": "out_port",
+                "type": :"port",
+                "ask": {
+                    "en": "Please enter a port for shadowsocks-python [1-65535]"
+                },
+           
+                "example": "9000"
+            },
+            {
+                "name": "cipher",
+                "type": "string",
+                "ask": {
+                    "en": "Choose the cipher for Shadowsocks"
+                },
+                "choices": ["aes-256-gcm", "aes-192-gcm", "aes-128-gcm", "aes-256-ctr", "aes-192-ctr", "aes-128-ctr", "aes-256-cfb", "aes-192-cfb", "aes-128-cfb", "camellia-128-cfb", "camellia-192-cfb", "camellia-256-cfb", "chacha20-ietf-poly1305", "chacha20-ietf", "chacha20", "rc4-md5" ],
+                "default": "aes-256-gcm"
+            }
+        ]
+    }
+}

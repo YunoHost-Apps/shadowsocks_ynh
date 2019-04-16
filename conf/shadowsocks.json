@@ -1,0 +1,10 @@
+{
+	"server":"0.0.0.0",
+    "server_port":__PORT__,
+    "local_address":"127.0.0.1",
+    "local_port":__INTERNAL_PORT__,
+    "password":"__PASSWORD__",
+    "timeout":300,
+    "method":"__CIPHER__",
+    "fast_open":false
+}

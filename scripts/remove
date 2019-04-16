@@ -1,0 +1,69 @@
+#!/bin/bash
+
+#=================================================
+# GENERIC START
+#=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
+
+source _common.sh
+source /usr/share/yunohost/helpers
+
+#=================================================
+# LOAD SETTINGS
+#=================================================
+ynh_print_info "Loading installation settings..."
+
+app=$YNH_APP_INSTANCE_NAME
+port=$(ynh_app_setting_get $app port)
+
+
+#=================================================
+# STANDARD REMOVE
+#=================================================
+ /etc/init.d/shadowsocks stop
+
+#=================================================
+# REMOVE DEPENDENCIES
+#=================================================
+ynh_print_info "Removing dependencies"
+
+# Remove metapackage and its dependencies
+ynh_remove_app_dependencies
+
+
+#=================================================
+# CLOSE A PORT
+#=================================================
+
+if yunohost firewall list | grep -q "\- $port$"
+then
+	ynh_print_info "Closing port $port"
+	ynh_exec_warn_less yunohost firewall disallow Both $port
+fi
+
+#=================================================
+# SPECIFIC REMOVE
+#=================================================
+# REMOVE THE CRON FILE
+#=================================================
+
+update-rc.d -f shadowsocks remove
+
+# Remove a shadowsocks files
+ynh_secure_remove "/etc/shadowsocks.json"
+ynh_secure_remove "/var/run/shadowsocks.pid"
+ynh_secure_remove "/etc/init.d/shadowsocks"
+ynh_secure_remove "/var/log/shadowsocks.log"
+ynh_secure_remove "/etc/shadowsocks.json"
+
+if [ -f /usr/local/shadowsocks_install.log ]; then
+            cat /usr/local/shadowsocks_install.log | xargs rm -rf
+fi
+
+
+#=================================================
+# END OF SCRIPT
+#=================================================
+
+ynh_print_info "Removal of $app completed"

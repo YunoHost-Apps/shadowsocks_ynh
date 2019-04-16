@@ -1,0 +1,6 @@
+SOURCE_URL=https://github.com/shadowsocks/shadowsocks/archive/5ff694b2c2978b432918dea6ac104706b25cbf48.zip
+SOURCE_SUM=1c7d281f8a6f59af7be6d914127df61da9600b011c7e188f999a045d3d6a8cf9
+SOURCE_SUM_PRG=sha256sum
+SOURCE_FORMAT=zip
+SOURCE_IN_SUBDIR=true
+SOURCE_FILENAME=
