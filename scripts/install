@@ -63,17 +63,7 @@ ynh_print_info "Configuring firewall..."
 ### `ynh_find_port` will find the first available port starting from the given port.
 ### If you're not using these lines:
 ###		- Remove the section "CLOSE A PORT" in the remove script
-
-
-if [ ${out_port} -ge 1 ] && [ ${out_port} -le 65535 ] && [ ${out_port:0:1} != 0 ]; then
-	ynh_print_info "---------------------------"
-    ynh_print_info "Port to configure = ${out_port}"
-    ynh_print_info "---------------------------"
-    else
-		ynh_die "Please enter a correct number [1-65535]"
-fi
     
-done
 
 # Find a free port
 port=$(ynh_find_port $out_port)

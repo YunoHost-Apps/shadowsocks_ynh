@@ -35,6 +35,7 @@
             },
             {
                 "name": "out_port",
+                "type": "port",
                 "ask": {
                     "en": "Please enter a port for shadowsocks-python [1-65535]"
                 },
