@@ -137,10 +137,11 @@ ynh_setup_source "${tmpdir}/shadowsocks" "shadowsocks"
     python setup.py install --record /usr/local/shadowsocks_install.log
     )
     if [ -f /usr/bin/ssserver ] || [ -f /usr/local/bin/ssserver ]; then
-        chmod +x /etc/init.d/shadowsocks
-        update-rc.d -f shadowsocks defaults
         cp -f "../conf/shadowsocks.json" "/etc/."
         cp -f "../conf/shadowsocks" "/etc/init.d/."
+        chmod +x /etc/init.d/shadowsocks
+        update-rc.d -f shadowsocks defaults
+        
         #=================================================
 		# MODIFY A CONFIG FILE
 		#=================================================
