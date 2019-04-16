@@ -21,7 +21,9 @@ port=$(ynh_app_setting_get $app port)
 #=================================================
 # STANDARD REMOVE
 #=================================================
- /etc/init.d/shadowsocks stop
+if [ -f  /etc/init.d/shadowsocks ]; then
+	/etc/init.d/shadowsocks stop
+fi
 
 #=================================================
 # REMOVE DEPENDENCIES

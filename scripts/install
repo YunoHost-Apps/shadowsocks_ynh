@@ -49,7 +49,7 @@ app=$YNH_APP_INSTANCE_NAME
 #=================================================
 ynh_print_info "Storing installation settings..."
 
-ynh_app_setting_set $app password $passowrd
+ynh_app_setting_set $app password $password
 ynh_app_setting_set $app cipher $cipher
 
 #=================================================
