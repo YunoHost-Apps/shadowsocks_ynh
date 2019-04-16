@@ -187,9 +187,9 @@ Your Server IP: $ip
 Your Server Port: $port
 Your Password: $password
 Your Encryption Method: $cipher
-If you are facing any problem or want to improve this app, please open a new issue here: https://github.com/YunoHost-Apps/shadowsocks_ynh/issues"
+If you are facing any problem or want to improve this app, please open a new issue here: https://github.com/YunoHost-Apps/shadowsocks_ynh/issues "
 
-ynh_send_readme_to_admin "$message"
+ynh_send_readme_to_admin "$message" 
 
 #=================================================
 # END OF SCRIPT

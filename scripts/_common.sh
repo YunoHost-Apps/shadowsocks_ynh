@@ -51,7 +51,7 @@ ynh_smart_mktemp () {
 }
 
 # Send an email to inform the administrator
-#
+# 
 # usage: ynh_send_readme_to_admin app_message [recipients]
 # | arg: app_message - The message to send to the administrator.
 # | arg: recipients - The recipients of this email. Use spaces to separate multiples recipients. - default: root
