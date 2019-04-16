@@ -47,12 +47,27 @@ fi
 #=================================================
 # SPECIFIC REMOVE
 #=================================================
-# REMOVE THE CRON FILE
+# REMOVE THE SHADOWSOCKS FILES
 #=================================================
+tmpdir="$(ynh_smart_mktemp 300)"
 
-update-rc.d -f shadowsocks remove
+ynh_print_info "Extracting libsodium sorces into temp directory for installation..."
+# Download, check integrity, uncompress and patch the source from libsodium.src
+ynh_setup_source "${tmpdir}/${libsodium_file}" "libsodium"
+
+# Remove Libsodium 
+if [ -f /usr/lib/libsodium.a ]; then
+       (
+       cd ${tmpdir}/${libsodium_file}
+       ./configure --prefix=/usr && make && make uninstall
+       )
+ 
+fi
+ 
+sudo rm -Rf "$tmpdir"
 
 # Remove a shadowsocks files
+update-rc.d -f shadowsocks remove
 ynh_secure_remove "/etc/shadowsocks.json"
 ynh_secure_remove "/var/run/shadowsocks.pid"
 ynh_secure_remove "/etc/init.d/shadowsocks"
