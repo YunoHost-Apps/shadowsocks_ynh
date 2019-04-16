@@ -5,7 +5,7 @@
 #=================================================
 
 # dependencies used by the app
-pkg_dependencies="install python python-dev python-setuptools openssl libssl-dev curl wget unzip gcc automake autoconf make libtool"
+pkg_dependencies="python python-dev python-setuptools openssl libssl-dev curl wget unzip gcc automake autoconf make libtool"
 
 # libsodium version for temp folder
 libsodium_file="libsodium-1.0.17"
