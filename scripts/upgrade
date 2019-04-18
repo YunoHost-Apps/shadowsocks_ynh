@@ -1,0 +1,162 @@
+#!/bin/bash
+
+#=================================================
+# GENERIC START
+#=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
+
+source _common.sh
+source /usr/share/yunohost/helpers
+
+#=================================================
+# LOAD SETTINGS
+#=================================================
+ynh_print_info "Loading installation settings..."
+
+app=$YNH_APP_INSTANCE_NAME
+
+password=$(ynh_app_setting_get $app password)
+internal_port=$(ynh_app_setting_get $app internal_port)
+port=$(ynh_app_setting_get $app port)
+cipher=$(ynh_app_setting_get $app cipher)
+
+
+# Stop service
+
+service shadowsocks stop
+
+sleep 10
+
+
+#=================================================
+# BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
+#=================================================
+ynh_print_info "Backing up the app before upgrading (may take a while)..."
+
+# Backup the current version of the app
+ynh_backup_before_upgrade
+ynh_clean_setup () {
+	# restore it if the upgrade fails
+	ynh_restore_upgradebackup
+}
+# Exit if an error occurs during the execution of the script
+ynh_abort_if_errors
+
+
+#=================================================
+# INSTALL DEPENDENCIES
+#=================================================
+ynh_print_info "Installing dependencies..."
+
+
+ynh_install_app_dependencies $pkg_dependencies
+
+#=================================================
+# DOWNLOAD, CHECK AND UNPACK SOURCE
+#=================================================
+ynh_print_info "Setting up source files..."
+
+### `ynh_setup_source` is used to install an app from a zip or tar.gz file,
+### downloaded from an upstream source, like a git repository.
+### `ynh_setup_source` use the file conf/app.src
+
+tmpdir="$(ynh_smart_mktemp 300)"
+
+ynh_print_info "Extracting libsodium sorces into temp directory for installation..."
+# Download, check integrity, uncompress and patch the source from libsodium.src
+ynh_setup_source "${tmpdir}/${libsodium_file}" "libsodium"
+
+ynh_print_info "Extracting shadowsocks sorces into temp directory for installation..."
+# Download, check integrity, uncompress and patch the source from shadowsocks.src
+ynh_setup_source "${tmpdir}/shadowsocks" "shadowsocks"
+
+
+# Open this port
+ynh_exec_warn_less yunohost firewall allow --no-upnp Both $port
+
+
+#=================================================
+# SPECIFIC SETUP
+#=================================================
+
+# Install Shadowsocks
+
+    # Install libsodium
+
+       (
+       cd ${tmpdir}/${libsodium_file}
+       ./configure --prefix=/usr && make && make install
+       )
+        
+
+    # Install Shadowsocks
+    (
+    cd ${tmpdir}/shadowsocks
+    python setup.py install --record /usr/local/shadowsocks_install.log
+    )
+    if [ -f /usr/bin/ssserver ] || [ -f /usr/local/bin/ssserver ]; then
+        cp -f "../conf/shadowsocks.json" "/etc/."
+        cp -f "../conf/shadowsocks" "/etc/init.d/."
+        chmod +x /etc/init.d/shadowsocks
+        update-rc.d -f shadowsocks defaults
+        
+        #=================================================
+		# MODIFY A CONFIG FILE
+		#=================================================
+
+		### `ynh_replace_string` is used to replace a string in a file.
+		### (It's compatible with sed regular expressions syntax)
+
+		ynh_replace_string "__PORT__"          "$port"          "/etc/shadowsocks.json"
+		ynh_replace_string "__INTERNAL_PORT__" "$internal_port" "/etc/shadowsocks.json"
+		ynh_replace_string "__PASSWORD__"      "$password"      "/etc/shadowsocks.json"
+		ynh_replace_string "__CIPHER__"        "$cipher"        "/etc/shadowsocks.json"
+    else
+        ynh_die "Shadowsocks install failed! please open an issue here https://github.com/YunoHost-Apps/shadowsocks_ynh/issues"
+fi
+
+sudo rm -Rf "$tmpdir"
+
+
+
+
+#=================================================
+# SPECIFIC UPGRADE
+#=================================================
+# ...
+#=================================================
+
+### Verify the checksum of a file, stored by `ynh_store_file_checksum` in the install script.
+### And create a backup of this file if the checksum is different. So the file will be backed up if the admin had modified it.
+ynh_backup_if_checksum_is_different "/etc/shadowsocks.json"
+# Recalculate and store the checksum of the file for the next upgrade.
+ynh_store_file_checksum "/etc/shadowsocks.json"
+
+#=================================================
+# SETUP LOGROTATE
+#=================================================
+ynh_print_info "Upgrading logrotate configuration..."
+
+# Use logrotate to manage app-specific logfile(s)
+ynh_use_logrotate --non-append
+
+
+yunohost service add $app --log "/var/log/$app.log"
+# if using yunohost version 3.2 or more in the 'manifest.json', a description can be added
+yunohost service add $app --description "$app daemon for Shadowsocks" --log "/var/log/$app.log"
+
+#=================================================
+# START SERVICE
+#=================================================
+ynh_print_info "Start $app service..."
+
+service shadowsocks start
+
+sleep 10
+
+#=================================================
+# END OF SCRIPT
+#=================================================
+
+ynh_print_info "Upgrade of $app completed"
