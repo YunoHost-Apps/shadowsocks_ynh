@@ -171,11 +171,28 @@ ynh_store_file_checksum "/etc/shadowsocks.json"
 
 
 #=================================================
-# Start Shadosocks
+# ADVERTISE SERVICE IN ADMIN PANEL
 #=================================================
-ynh_print_info "Start Shadowsocks server..."
 
-/etc/init.d/shadowsocks start
+### `yunohost service add` is a CLI yunohost command to add a service in the admin panel.
+### You'll find the service in the 'services' section of YunoHost admin panel.
+### This CLI command would be useless if the app does not have any services (systemd or sysvinit)
+### If you're not using these lines:
+###		- You can remove these files in conf/.
+###		- Remove the section "REMOVE SERVICE FROM ADMIN PANEL" in the remove script
+###		- As well as the section "ADVERTISE SERVICE IN ADMIN PANEL" in the restore script
+
+yunohost service add $app --log "/var/log/$app.log"
+# if using yunohost version 3.2 or more in the 'manifest.json', a description can be added
+yunohost service add $app --description "$app daemon for Shadowsocks" --log "/var/log/$app.log"
+
+#=================================================
+# START SERVICE
+#=================================================
+ynh_print_info "Start $app service..."
+
+ynh_systemd_action --service_name="$app" --action="start" --log_path="systemd" --line_match="Server listening on localhost"
+
 
 #=================================================
 # SEND A README FOR THE ADMIN
