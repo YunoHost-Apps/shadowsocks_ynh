@@ -191,7 +191,7 @@ yunohost service add $app --description "$app daemon for Shadowsocks" --log "/va
 #=================================================
 ynh_print_info "Start $app service..."
 
-Service shadowsocks start
+service shadowsocks start
 
 sleep 10
 
