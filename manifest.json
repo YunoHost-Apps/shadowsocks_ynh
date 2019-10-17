@@ -1,5 +1,5 @@
 {
-    "name": "Shadowsocks for  Yunohost",
+    "name": "Shadowsocks",
     "id": "shadowsocks",
     "packaging_format": 1,
     "description": {
