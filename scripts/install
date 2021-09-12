@@ -13,10 +13,6 @@ source /usr/share/yunohost/helpers
 # MANAGE SCRIPT FAILURE
 #=================================================
 
-ynh_clean_setup () {
-	### Remove this function if there's nothing to clean before calling the remove script.
-	true
-}
 # Exit if an error occurs during the execution of the script
 ynh_abort_if_errors
 
@@ -30,19 +26,7 @@ out_port=$YNH_APP_ARG_OUT_PORT
 cipher=$YNH_APP_ARG_CIPHER
 ip=$(ip addr | egrep -o '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | egrep -v "^192\.168|^172\.1[6-9]\.|^172\.2[0-9]\.|^172\.3[0-2]\.|^10\.|^127\.|^255\.|^0\." | head -n 1 )
 
-### If it's a multi-instance app, meaning it can be installed several times independently
-### The id of the app as stated in the manifest is available as $YNH_APP_ID
-### The instance number is available as $YNH_APP_INSTANCE_NUMBER (equals "1", "2", ...)
-### The app instance name is available as $YNH_APP_INSTANCE_NAME
-###    - the first time the app is installed, YNH_APP_INSTANCE_NAME = ynhexample
-###    - the second time the app is installed, YNH_APP_INSTANCE_NAME = ynhexample__2
-###    - ynhexample__{N} for the subsequent installations, with N=3,4, ...
-### The app instance name is probably what interests you most, since this is
-### guaranteed to be unique. This is a good unique identifier to define installation path,
-### db names, ...
 app=$YNH_APP_INSTANCE_NAME
-
-
 
 #=================================================
 # STORE SETTINGS FROM MANIFEST
@@ -58,12 +42,6 @@ ynh_app_setting_set $app cipher $cipher
 # FIND AND OPEN A PORT
 #=================================================
 ynh_print_info "Configuring firewall..."
-
-### Use these lines if you have to open a port for the application
-### `ynh_find_port` will find the first available port starting from the given port.
-### If you're not using these lines:
-###		- Remove the section "CLOSE A PORT" in the remove script
-    
 
 # Find a free port
 port=$(ynh_find_port $out_port)
@@ -81,26 +59,12 @@ ynh_app_setting_set $app internal_port $internal_port
 #=================================================
 ynh_print_info "Installing dependencies..."
 
-### `ynh_install_app_dependencies` allows you to add any "apt" dependencies to the package.
-### Those deb packages will be installed as dependencies of this package.
-### If you're not using this helper:
-###		- Remove the section "REMOVE DEPENDENCIES" in the remove script
-###		- Remove the variable "pkg_dependencies" in _common.sh
-###		- As well as the section "REINSTALL DEPENDENCIES" in the restore script
-###		- And the section "UPGRADE DEPENDENCIES" in the upgrade script
-
 ynh_install_app_dependencies $pkg_dependencies
-
-
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
 ynh_print_info "Setting up source files..."
-
-### `ynh_setup_source` is used to install an app from a zip or tar.gz file,
-### downloaded from an upstream source, like a git repository.
-### `ynh_setup_source` use the file conf/app.src
 
 tmpdir="$(ynh_smart_mktemp 300)"
 
@@ -111,8 +75,6 @@ ynh_setup_source "${tmpdir}/${libsodium_file}" "libsodium"
 ynh_print_info "Extracting shadowsocks sorces into temp directory for installation..."
 # Download, check integrity, uncompress and patch the source from shadowsocks.src
 ynh_setup_source "${tmpdir}/shadowsocks" "shadowsocks"
-
-
 
 #=================================================
 # SPECIFIC SETUP
@@ -126,7 +88,6 @@ ynh_setup_source "${tmpdir}/shadowsocks" "shadowsocks"
        cd ${tmpdir}/${libsodium_file}
        ./configure --prefix=/usr && make && make install
        )
-        
     fi
 
     # Install Shadowsocks
@@ -155,32 +116,18 @@ ynh_setup_source "${tmpdir}/shadowsocks" "shadowsocks"
         ynh_die "Shadowsocks install failed! please open an issue here https://github.com/YunoHost-Apps/shadowsocks_ynh/issues"
 fi
 
-sudo rm -Rf "$tmpdir"
+rm -Rf "$tmpdir"
 
 #=================================================
 # STORE THE CONFIG FILE CHECKSUM
 #=================================================
 
-### `ynh_store_file_checksum` is used to store the checksum of a file.
-### That way, during the upgrade script, by using `ynh_backup_if_checksum_is_different`,
-### you can make a backup of this file before modifying it again if the admin had modified it.
-
 # Calculate and store the config file checksum into the app settings
 ynh_store_file_checksum "/etc/shadowsocks.json"
-
-
 
 #=================================================
 # ADVERTISE SERVICE IN ADMIN PANEL
 #=================================================
-
-### `yunohost service add` is a CLI yunohost command to add a service in the admin panel.
-### You'll find the service in the 'services' section of YunoHost admin panel.
-### This CLI command would be useless if the app does not have any services (systemd or sysvinit)
-### If you're not using these lines:
-###		- You can remove these files in conf/.
-###		- Remove the section "REMOVE SERVICE FROM ADMIN PANEL" in the remove script
-###		- As well as the section "ADVERTISE SERVICE IN ADMIN PANEL" in the restore script
 
 yunohost service add $app --log "/var/log/$app.log"
 # if using yunohost version 3.2 or more in the 'manifest.json', a description can be added
@@ -194,7 +141,6 @@ ynh_print_info "Start $app service..."
 service shadowsocks start
 
 sleep 10
-
 
 #=================================================
 # SEND A README FOR THE ADMIN

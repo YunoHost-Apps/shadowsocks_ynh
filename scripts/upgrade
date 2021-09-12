@@ -21,13 +21,9 @@ internal_port=$(ynh_app_setting_get $app internal_port)
 port=$(ynh_app_setting_get $app port)
 cipher=$(ynh_app_setting_get $app cipher)
 
-
-# Stop service
-
 service shadowsocks stop
 
 sleep 10
-
 
 #=================================================
 # BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
@@ -43,12 +39,10 @@ ynh_clean_setup () {
 # Exit if an error occurs during the execution of the script
 ynh_abort_if_errors
 
-
 #=================================================
 # INSTALL DEPENDENCIES
 #=================================================
 ynh_print_info "Installing dependencies..."
-
 
 ynh_install_app_dependencies $pkg_dependencies
 
@@ -56,10 +50,6 @@ ynh_install_app_dependencies $pkg_dependencies
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
 ynh_print_info "Setting up source files..."
-
-### `ynh_setup_source` is used to install an app from a zip or tar.gz file,
-### downloaded from an upstream source, like a git repository.
-### `ynh_setup_source` use the file conf/app.src
 
 tmpdir="$(ynh_smart_mktemp 300)"
 
@@ -71,10 +61,8 @@ ynh_print_info "Extracting shadowsocks sorces into temp directory for installati
 # Download, check integrity, uncompress and patch the source from shadowsocks.src
 ynh_setup_source "${tmpdir}/shadowsocks" "shadowsocks"
 
-
 # Open this port
 ynh_exec_warn_less yunohost firewall allow --no-upnp Both $port
-
 
 #=================================================
 # SPECIFIC SETUP
@@ -89,7 +77,6 @@ ynh_exec_warn_less yunohost firewall allow --no-upnp Both $port
        ./configure --prefix=/usr && make && make install
        )
         
-
     # Install Shadowsocks
     (
     cd ${tmpdir}/shadowsocks
@@ -116,10 +103,7 @@ ynh_exec_warn_less yunohost firewall allow --no-upnp Both $port
         ynh_die "Shadowsocks install failed! please open an issue here https://github.com/YunoHost-Apps/shadowsocks_ynh/issues"
 fi
 
-sudo rm -Rf "$tmpdir"
-
-
-
+rm -Rf "$tmpdir"
 
 #=================================================
 # SPECIFIC UPGRADE
@@ -140,7 +124,6 @@ ynh_print_info "Upgrading logrotate configuration..."
 
 # Use logrotate to manage app-specific logfile(s)
 ynh_use_logrotate --non-append
-
 
 yunohost service add $app --log "/var/log/$app.log"
 # if using yunohost version 3.2 or more in the 'manifest.json', a description can be added

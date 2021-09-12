@@ -17,10 +17,10 @@ ynh_print_info "Loading installation settings..."
 app=$YNH_APP_INSTANCE_NAME
 port=$(ynh_app_setting_get $app port)
 
-
 #=================================================
 # STANDARD REMOVE
 #=================================================
+
 if [ -f  /etc/init.d/shadowsocks ]; then
 	/etc/init.d/shadowsocks stop
 fi
@@ -98,7 +98,6 @@ ynh_secure_remove "/etc/shadowsocks.json"
 if [ -f /usr/local/shadowsocks_install.log ]; then
             cat /usr/local/shadowsocks_install.log | xargs rm -rf
 fi
-
 
 #=================================================
 # END OF SCRIPT
